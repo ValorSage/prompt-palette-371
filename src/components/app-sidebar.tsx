@@ -1,4 +1,5 @@
 import { Link, useRouterState } from "@tanstack/react-router";
+import { useState, useCallback, useMemo } from "react";
 import {
   Images,
   FolderKanban,
@@ -36,12 +37,24 @@ const items = [
   { title: "References", url: "/references", icon: Layers },
 ] as const;
 
-
 export function AppSidebar({ onSignOut }: { onSignOut?: () => void }) {
   const path = useRouterState({ select: (s) => s.location.pathname });
   const { user } = useAuth();
-  const name = (user?.user_metadata?.["full_name"] as string) ?? user?.email ?? "Account";
-  const avatar = user?.user_metadata?.["avatar_url"] as string | undefined;
+  const [dropdownOpen, setDropdownOpen] = useState(false);
+  
+  const name = useMemo(
+    () => (user?.user_metadata?.["full_name"] as string) ?? user?.email ?? "Account",
+    [user?.user_metadata?.["full_name"], user?.email]
+  );
+  const avatar = useMemo(
+    () => user?.user_metadata?.["avatar_url"] as string | undefined,
+    [user?.user_metadata?.["avatar_url"]]
+  );
+
+  const handleSignOut = useCallback(() => {
+    setDropdownOpen(false);
+    onSignOut?.();
+  }, [onSignOut]);
 
   return (
     <Sidebar collapsible="icon" className="border-r border-sidebar-border">
@@ -65,6 +78,7 @@ export function AppSidebar({ onSignOut }: { onSignOut?: () => void }) {
                     asChild
                     isActive={path.startsWith(item.url) && !("search" in item)}
                     tooltip={item.title}
+                    onClick={() => setDropdownOpen(false)}
                   >
                     <Link to={item.url} search={"search" in item ? item.search : undefined}>
                       <item.icon className="h-4 w-4" />
@@ -79,7 +93,7 @@ export function AppSidebar({ onSignOut }: { onSignOut?: () => void }) {
       </SidebarContent>
 
       <SidebarFooter className="border-t border-sidebar-border p-3">
-        <DropdownMenu>
+        <DropdownMenu open={dropdownOpen} onOpenChange={setDropdownOpen}>
           <DropdownMenuTrigger asChild>
             <button className="w-full flex items-center gap-2.5 overflow-hidden rounded-md px-1 py-1.5 hover:bg-secondary transition">
               <Avatar className="h-8 w-8 shrink-0">
@@ -92,7 +106,11 @@ export function AppSidebar({ onSignOut }: { onSignOut?: () => void }) {
 
           <DropdownMenuContent side="top" align="start" className="w-56">
             <DropdownMenuItem asChild>
-              <Link to="/settings" className="flex items-center gap-2">
+              <Link 
+                to="/settings" 
+                className="flex items-center gap-2 cursor-pointer"
+                onClick={() => setDropdownOpen(false)}
+              >
                 <SettingsIcon className="h-4 w-4" />
                 <span>Settings</span>
               </Link>
@@ -100,7 +118,7 @@ export function AppSidebar({ onSignOut }: { onSignOut?: () => void }) {
 
             <DropdownMenuSeparator />
 
-            <DropdownMenuItem onSelect={() => onSignOut && onSignOut()} className="text-destructive">
+            <DropdownMenuItem onSelect={handleSignOut} className="text-destructive cursor-pointer">
               <LogOut className="h-4 w-4" />
               <span>Sign out</span>
             </DropdownMenuItem>

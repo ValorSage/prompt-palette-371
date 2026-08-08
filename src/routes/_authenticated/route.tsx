@@ -1,5 +1,6 @@
 import { createFileRoute, Outlet, redirect, useNavigate, useRouterState } from "@tanstack/react-router";
 import { useQueryClient } from "@tanstack/react-query";
+import { useMemo, useCallback } from "react";
 
 import { supabase } from "@/integrations/supabase/client";
 import { SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar";
@@ -19,14 +20,15 @@ function AuthenticatedLayout() {
   const navigate = useNavigate();
   const queryClient = useQueryClient();
   const path = useRouterState({ select: (s) => s.location.pathname });
-  const isSettingsPage = path.startsWith("/settings");
+  
+  const isSettingsPage = useMemo(() => path.startsWith("/settings"), [path]);
 
-  async function signOut() {
+  const signOut = useCallback(async () => {
     await queryClient.cancelQueries();
     queryClient.clear();
     await supabase.auth.signOut();
     navigate({ to: "/login", replace: true });
-  }
+  }, [queryClient, navigate]);
 
   return (
     <SidebarProvider defaultOpen={!isSettingsPage}>
@@ -38,7 +40,7 @@ function AuthenticatedLayout() {
               <SidebarTrigger />
             </header>
           )}
-          <main className="min-w-0 flex-1">
+          <main className="min-w-0 flex-1 overflow-auto">
             <Outlet />
           </main>
         </div>
