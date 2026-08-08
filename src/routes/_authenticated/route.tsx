@@ -1,6 +1,5 @@
-import { createFileRoute, Outlet, redirect, useNavigate } from "@tanstack/react-router";
+import { createFileRoute, Outlet, redirect, useNavigate, useRouterState } from "@tanstack/react-router";
 import { useQueryClient } from "@tanstack/react-query";
-import { LogOut } from "lucide-react";
 
 import { supabase } from "@/integrations/supabase/client";
 import { SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar";
@@ -19,6 +18,8 @@ export const Route = createFileRoute("/_authenticated")({
 function AuthenticatedLayout() {
   const navigate = useNavigate();
   const queryClient = useQueryClient();
+  const path = useRouterState({ select: (s) => s.location.pathname });
+  const isSettingsPage = path.startsWith("/settings");
 
   async function signOut() {
     await queryClient.cancelQueries();
@@ -28,13 +29,15 @@ function AuthenticatedLayout() {
   }
 
   return (
-    <SidebarProvider>
-      <div className="flex min-h-screen w-full bg-background">
-        <AppSidebar onSignOut={signOut} />
-        <div className="flex min-w-0 flex-1 flex-col">
-          <header className="sticky top-0 z-20 flex h-14 items-center justify-between gap-2 border-b border-border bg-background/80 px-3 backdrop-blur">
-            <SidebarTrigger />
-          </header>
+    <SidebarProvider defaultOpen={!isSettingsPage}>
+      <div className={`flex min-h-screen w-full bg-background ${isSettingsPage ? "flex-col" : ""}`}>
+        {!isSettingsPage && <AppSidebar onSignOut={signOut} />}
+        <div className={`flex min-w-0 ${isSettingsPage ? "w-full flex-col" : "flex-1 flex-col"}`}>
+          {!isSettingsPage && (
+            <header className="sticky top-0 z-20 flex h-14 items-center justify-between gap-2 border-b border-border bg-background/80 px-3 backdrop-blur">
+              <SidebarTrigger />
+            </header>
+          )}
           <main className="min-w-0 flex-1">
             <Outlet />
           </main>
