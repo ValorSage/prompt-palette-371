@@ -1,6 +1,6 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { Plus, Trash2, Pencil } from "lucide-react";
+import { Plus, Trash2, Pencil, Heart } from "lucide-react";
 import { useState } from "react";
 import { toast } from "sonner";
 
@@ -71,18 +71,28 @@ function ProjectsPage() {
 
   return (
     <div className="mx-auto max-w-5xl px-5 py-8">
-      <div className="flex items-center justify-between">
+      <div className="flex items-center justify-between gap-3">
         <h1 className="text-2xl font-semibold">Projects</h1>
-        <Button
-          className="gap-1.5"
-          onClick={async () => {
-            if (!user) return;
-            const project = await createProject(user.id);
-            navigate({ to: "/projects/$projectId", params: { projectId: project.id } });
-          }}
-        >
-          <Plus className="h-4 w-4" /> New project
-        </Button>
+        <div className="flex gap-2">
+          <Button
+            variant="outline"
+            size="icon"
+            title="View Favorites"
+            onClick={() => navigate({ to: "/gallery", search: { favorites: true } })}
+          >
+            <Heart className="h-4 w-4" />
+          </Button>
+          <Button
+            className="gap-1.5"
+            onClick={async () => {
+              if (!user) return;
+              const project = await createProject(user.id);
+              navigate({ to: "/projects/$projectId", params: { projectId: project.id } });
+            }}
+          >
+            <Plus className="h-4 w-4" /> New project
+          </Button>
+        </div>
       </div>
 
       <div className="mt-6 space-y-2">
