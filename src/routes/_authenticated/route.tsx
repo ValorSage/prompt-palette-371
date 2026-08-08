@@ -13,6 +13,7 @@ export const Route = createFileRoute("/_authenticated")({
     return { user: data.user };
   },
   component: AuthenticatedLayout,
+  errorComponent: () => <div>Error</div>,
 });
 
 function AuthenticatedLayout() {
