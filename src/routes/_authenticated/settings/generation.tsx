@@ -32,11 +32,12 @@ function GenerationSettings() {
     },
   });
 
-  async function save(key: string, value: string) {
+  async function save(key: SettingKey, value: string) {
     if (!user) return;
     const { error } = await supabase
       .from("user_settings")
-      .upsert({ user_id: user.id, [key]: value }, { onConflict: "user_id" });
+      .upsert({ user_id: user.id, [key]: value } as never, { onConflict: "user_id" });
+
     if (error) {
       toast.error(error.message);
       return;
