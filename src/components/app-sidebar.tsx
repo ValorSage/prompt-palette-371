@@ -5,9 +5,7 @@ import {
   Layers,
   Heart,
   Settings as SettingsIcon,
-  BarChart3,
   Sparkles,
-  User as UserIcon,
   LogOut,
 } from "lucide-react";
 
@@ -115,20 +113,6 @@ export function AppSidebar({ onSignOut }: { onSignOut?: () => void }) {
               <Link to="/settings" className="flex items-center gap-2 w-full">
                 <SettingsIcon className="h-4 w-4" />
                 <span>Settings</span>
-              </Link>
-            </DropdownMenuItem>
-
-            <DropdownMenuItem asChild>
-              <Link to="/settings/usage" className="flex items-center gap-2 w-full">
-                <BarChart3 className="h-4 w-4" />
-                <span>Usage</span>
-              </Link>
-            </DropdownMenuItem>
-
-            <DropdownMenuItem asChild>
-              <Link to="/settings/account" className="flex items-center gap-2 w-full">
-                <UserIcon className="h-4 w-4" />
-                <span>Profile</span>
               </Link>
             </DropdownMenuItem>
 
