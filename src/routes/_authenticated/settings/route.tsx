@@ -8,7 +8,6 @@ export const Route = createFileRoute("/_authenticated/settings")({
 });
 
 const tabs = [
-  { to: "/settings/account", label: "Account" },
   { to: "/settings/generation", label: "Generation" },
   { to: "/settings/references", label: "References" },
   { to: "/settings/usage", label: "Usage" },
