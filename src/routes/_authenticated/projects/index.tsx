@@ -1,7 +1,7 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { Plus, Trash2, Pencil, Heart } from "lucide-react";
-import { useState, useCallback, useMemo, memo } from "react";
+import { Plus, Trash2, Pencil } from "lucide-react";
+import { useState } from "react";
 import { toast } from "sonner";
 
 import { supabase } from "@/integrations/supabase/client";
@@ -24,77 +24,6 @@ import {
 
 export const Route = createFileRoute("/_authenticated/projects/")({
   component: ProjectsPage,
-});
-
-const ProjectItem = memo(function ProjectItem({
-  project,
-  editing,
-  value,
-  onEditChange,
-  onValueChange,
-  onSave,
-  onEditClick,
-  onDelete,
-}: {
-  project: any;
-  editing: string | null;
-  value: string;
-  onEditChange: (value: string) => void;
-  onValueChange: (value: string) => void;
-  onSave: () => void;
-  onEditClick: () => void;
-  onDelete: () => void;
-}) {
-  return (
-    <div className="panel flex items-center gap-3 p-4">
-      {editing === project.id ? (
-        <form className="flex flex-1 gap-2" onSubmit={(e) => { e.preventDefault(); onSave(); }}>
-          <Input value={value} onChange={(e) => onValueChange(e.target.value)} autoFocus className="h-8" />
-          <Button size="sm" type="submit">
-            Save
-          </Button>
-        </form>
-      ) : (
-        <Link
-          to="/projects/$projectId"
-          params={{ projectId: project.id }}
-          className="flex-1 truncate font-medium hover:text-primary"
-        >
-          {project.name}
-        </Link>
-      )}
-      <span className="hidden text-xs text-muted-foreground sm:inline">
-        {new Date(project.updated_at).toLocaleDateString()}
-      </span>
-      <Button
-        size="icon"
-        variant="ghost"
-        aria-label="Rename project"
-        onClick={onEditClick}
-      >
-        <Pencil className="h-4 w-4" />
-      </Button>
-      <AlertDialog>
-        <AlertDialogTrigger asChild>
-          <Button size="icon" variant="ghost" aria-label="Delete project">
-            <Trash2 className="h-4 w-4" />
-          </Button>
-        </AlertDialogTrigger>
-        <AlertDialogContent>
-          <AlertDialogHeader>
-            <AlertDialogTitle>Delete "{project.name}"?</AlertDialogTitle>
-            <AlertDialogDescription>
-              This permanently deletes the project, its conversations and its generated images.
-            </AlertDialogDescription>
-          </AlertDialogHeader>
-          <AlertDialogFooter>
-            <AlertDialogCancel>Cancel</AlertDialogCancel>
-            <AlertDialogAction onClick={onDelete}>Delete</AlertDialogAction>
-          </AlertDialogFooter>
-        </AlertDialogContent>
-      </AlertDialog>
-    </div>
-  );
 });
 
 function ProjectsPage() {
@@ -140,45 +69,20 @@ function ProjectsPage() {
     onError: (e: Error) => toast.error(e.message),
   });
 
-  const handleCreateProject = useCallback(async () => {
-    if (!user) return;
-    const project = await createProject(user.id);
-    navigate({ to: "/projects/$projectId", params: { projectId: project.id } });
-  }, [user, navigate]);
-
-  const handleViewFavorites = useCallback(() => {
-    navigate({ to: "/gallery", search: { favorites: true } });
-  }, [navigate]);
-
-  const handleRename = useCallback((id: string, name: string) => {
-    setEditing(id);
-    setValue(name);
-  }, []);
-
-  const handleSaveRename = useCallback(() => {
-    rename.mutate({ id: editing!, name: value.trim() || value });
-  }, [editing, value, rename]);
-
   return (
     <div className="mx-auto max-w-5xl px-5 py-8">
-      <div className="flex items-center justify-between gap-3">
+      <div className="flex items-center justify-between">
         <h1 className="text-2xl font-semibold">Projects</h1>
-        <div className="flex gap-2">
-          <Button
-            variant="outline"
-            size="icon"
-            title="View Favorites"
-            onClick={handleViewFavorites}
-          >
-            <Heart className="h-4 w-4" />
-          </Button>
-          <Button
-            className="gap-1.5"
-            onClick={handleCreateProject}
-          >
-            <Plus className="h-4 w-4" /> New project
-          </Button>
-        </div>
+        <Button
+          className="gap-1.5"
+          onClick={async () => {
+            if (!user) return;
+            const project = await createProject(user.id);
+            navigate({ to: "/projects/$projectId", params: { projectId: project.id } });
+          }}
+        >
+          <Plus className="h-4 w-4" /> New project
+        </Button>
       </div>
 
       <div className="mt-6 space-y-2">
@@ -189,17 +93,63 @@ function ProjectsPage() {
           </div>
         )}
         {projects.data?.map((p) => (
-          <ProjectItem
-            key={p.id}
-            project={p}
-            editing={editing}
-            value={value}
-            onEditChange={() => setEditing(null)}
-            onValueChange={setValue}
-            onSave={handleSaveRename}
-            onEditClick={() => handleRename(p.id, p.name)}
-            onDelete={() => remove.mutate(p.id)}
-          />
+          <div key={p.id} className="panel flex items-center gap-3 p-4">
+            {editing === p.id ? (
+              <form
+                className="flex flex-1 gap-2"
+                onSubmit={(e) => {
+                  e.preventDefault();
+                  rename.mutate({ id: p.id, name: value.trim() || p.name });
+                }}
+              >
+                <Input value={value} onChange={(e) => setValue(e.target.value)} autoFocus className="h-8" />
+                <Button size="sm" type="submit">
+                  Save
+                </Button>
+              </form>
+            ) : (
+              <Link
+                to="/projects/$projectId"
+                params={{ projectId: p.id }}
+                className="flex-1 truncate font-medium hover:text-primary"
+              >
+                {p.name}
+              </Link>
+            )}
+            <span className="hidden text-xs text-muted-foreground sm:inline">
+              {new Date(p.updated_at).toLocaleDateString()}
+            </span>
+            <Button
+              size="icon"
+              variant="ghost"
+              aria-label="Rename project"
+              onClick={() => {
+                setEditing(p.id);
+                setValue(p.name);
+              }}
+            >
+              <Pencil className="h-4 w-4" />
+            </Button>
+            <AlertDialog>
+              <AlertDialogTrigger asChild>
+                <Button size="icon" variant="ghost" aria-label="Delete project">
+                  <Trash2 className="h-4 w-4" />
+                </Button>
+              </AlertDialogTrigger>
+              <AlertDialogContent>
+                <AlertDialogHeader>
+                  <AlertDialogTitle>Delete “{p.name}”?</AlertDialogTitle>
+                  <AlertDialogDescription>
+                    This permanently deletes the project, its conversations and its generated images.
+                  </AlertDialogDescription>
+                </AlertDialogHeader>
+                <AlertDialogFooter>
+                  <AlertDialogCancel>Cancel</AlertDialogCancel>
+                  <AlertDialogAction onClick={() => remove.mutate(p.id)}>Delete</AlertDialogAction>
+                </AlertDialogFooter>
+              </AlertDialogContent>
+            </AlertDialog>
+          </div>
         ))}
       </div>
     </div>
