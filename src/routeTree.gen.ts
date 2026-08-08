@@ -20,6 +20,10 @@ import { Route as AuthenticatedProjectsProjectIdRouteImport } from './routes/_au
 import { Route as AuthenticatedReferencesIndexRouteImport } from './routes/_authenticated/references/index'
 import { Route as AuthenticatedReferencesCollectionIdRouteImport } from './routes/_authenticated/references/$collectionId'
 import { Route as AuthenticatedSettingsIndexRouteImport } from './routes/_authenticated/settings/index'
+import { Route as AuthenticatedSettingsAccountRouteImport } from './routes/_authenticated/settings/account'
+import { Route as AuthenticatedSettingsGenerationRouteImport } from './routes/_authenticated/settings/generation'
+import { Route as AuthenticatedSettingsReferencesRouteImport } from './routes/_authenticated/settings/references'
+import { Route as AuthenticatedSettingsUsageRouteImport } from './routes/_authenticated/settings/usage'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
@@ -81,6 +85,30 @@ const AuthenticatedSettingsIndexRoute =
     path: '/',
     getParentRoute: () => AuthenticatedSettingsRouteRoute,
   } as any)
+const AuthenticatedSettingsAccountRoute =
+  AuthenticatedSettingsAccountRouteImport.update({
+    id: '/account',
+    path: '/account',
+    getParentRoute: () => AuthenticatedSettingsRouteRoute,
+  } as any)
+const AuthenticatedSettingsGenerationRoute =
+  AuthenticatedSettingsGenerationRouteImport.update({
+    id: '/generation',
+    path: '/generation',
+    getParentRoute: () => AuthenticatedSettingsRouteRoute,
+  } as any)
+const AuthenticatedSettingsReferencesRoute =
+  AuthenticatedSettingsReferencesRouteImport.update({
+    id: '/references',
+    path: '/references',
+    getParentRoute: () => AuthenticatedSettingsRouteRoute,
+  } as any)
+const AuthenticatedSettingsUsageRoute =
+  AuthenticatedSettingsUsageRouteImport.update({
+    id: '/usage',
+    path: '/usage',
+    getParentRoute: () => AuthenticatedSettingsRouteRoute,
+  } as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
@@ -90,6 +118,10 @@ export interface FileRoutesByFullPath {
   '/gallery': typeof AuthenticatedGalleryRoute
   '/projects/$projectId': typeof AuthenticatedProjectsProjectIdRoute
   '/references/$collectionId': typeof AuthenticatedReferencesCollectionIdRoute
+  '/settings/account': typeof AuthenticatedSettingsAccountRoute
+  '/settings/generation': typeof AuthenticatedSettingsGenerationRoute
+  '/settings/references': typeof AuthenticatedSettingsReferencesRoute
+  '/settings/usage': typeof AuthenticatedSettingsUsageRoute
   '/projects/': typeof AuthenticatedProjectsIndexRoute
   '/references/': typeof AuthenticatedReferencesIndexRoute
   '/settings/': typeof AuthenticatedSettingsIndexRoute
@@ -101,6 +133,10 @@ export interface FileRoutesByTo {
   '/gallery': typeof AuthenticatedGalleryRoute
   '/projects/$projectId': typeof AuthenticatedProjectsProjectIdRoute
   '/references/$collectionId': typeof AuthenticatedReferencesCollectionIdRoute
+  '/settings/account': typeof AuthenticatedSettingsAccountRoute
+  '/settings/generation': typeof AuthenticatedSettingsGenerationRoute
+  '/settings/references': typeof AuthenticatedSettingsReferencesRoute
+  '/settings/usage': typeof AuthenticatedSettingsUsageRoute
   '/projects': typeof AuthenticatedProjectsIndexRoute
   '/references': typeof AuthenticatedReferencesIndexRoute
   '/settings': typeof AuthenticatedSettingsIndexRoute
@@ -115,6 +151,10 @@ export interface FileRoutesById {
   '/_authenticated/gallery': typeof AuthenticatedGalleryRoute
   '/_authenticated/projects/$projectId': typeof AuthenticatedProjectsProjectIdRoute
   '/_authenticated/references/$collectionId': typeof AuthenticatedReferencesCollectionIdRoute
+  '/_authenticated/settings/account': typeof AuthenticatedSettingsAccountRoute
+  '/_authenticated/settings/generation': typeof AuthenticatedSettingsGenerationRoute
+  '/_authenticated/settings/references': typeof AuthenticatedSettingsReferencesRoute
+  '/_authenticated/settings/usage': typeof AuthenticatedSettingsUsageRoute
   '/_authenticated/projects/': typeof AuthenticatedProjectsIndexRoute
   '/_authenticated/references/': typeof AuthenticatedReferencesIndexRoute
   '/_authenticated/settings/': typeof AuthenticatedSettingsIndexRoute
@@ -129,6 +169,10 @@ export interface FileRouteTypes {
     | '/gallery'
     | '/projects/$projectId'
     | '/references/$collectionId'
+    | '/settings/account'
+    | '/settings/generation'
+    | '/settings/references'
+    | '/settings/usage'
     | '/projects/'
     | '/references/'
     | '/settings/'
@@ -140,6 +184,10 @@ export interface FileRouteTypes {
     | '/gallery'
     | '/projects/$projectId'
     | '/references/$collectionId'
+    | '/settings/account'
+    | '/settings/generation'
+    | '/settings/references'
+    | '/settings/usage'
     | '/projects'
     | '/references'
     | '/settings'
@@ -153,6 +201,10 @@ export interface FileRouteTypes {
     | '/_authenticated/gallery'
     | '/_authenticated/projects/$projectId'
     | '/_authenticated/references/$collectionId'
+    | '/_authenticated/settings/account'
+    | '/_authenticated/settings/generation'
+    | '/_authenticated/settings/references'
+    | '/_authenticated/settings/usage'
     | '/_authenticated/projects/'
     | '/_authenticated/references/'
     | '/_authenticated/settings/'
@@ -243,15 +295,51 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedSettingsIndexRouteImport
       parentRoute: typeof AuthenticatedSettingsRouteRoute
     }
+    '/_authenticated/settings/account': {
+      id: '/_authenticated/settings/account'
+      path: '/account'
+      fullPath: '/settings/account'
+      preLoaderRoute: typeof AuthenticatedSettingsAccountRouteImport
+      parentRoute: typeof AuthenticatedSettingsRouteRoute
+    }
+    '/_authenticated/settings/generation': {
+      id: '/_authenticated/settings/generation'
+      path: '/generation'
+      fullPath: '/settings/generation'
+      preLoaderRoute: typeof AuthenticatedSettingsGenerationRouteImport
+      parentRoute: typeof AuthenticatedSettingsRouteRoute
+    }
+    '/_authenticated/settings/references': {
+      id: '/_authenticated/settings/references'
+      path: '/references'
+      fullPath: '/settings/references'
+      preLoaderRoute: typeof AuthenticatedSettingsReferencesRouteImport
+      parentRoute: typeof AuthenticatedSettingsRouteRoute
+    }
+    '/_authenticated/settings/usage': {
+      id: '/_authenticated/settings/usage'
+      path: '/usage'
+      fullPath: '/settings/usage'
+      preLoaderRoute: typeof AuthenticatedSettingsUsageRouteImport
+      parentRoute: typeof AuthenticatedSettingsRouteRoute
+    }
   }
 }
 
 interface AuthenticatedSettingsRouteRouteChildren {
+  AuthenticatedSettingsAccountRoute: typeof AuthenticatedSettingsAccountRoute
+  AuthenticatedSettingsGenerationRoute: typeof AuthenticatedSettingsGenerationRoute
+  AuthenticatedSettingsReferencesRoute: typeof AuthenticatedSettingsReferencesRoute
+  AuthenticatedSettingsUsageRoute: typeof AuthenticatedSettingsUsageRoute
   AuthenticatedSettingsIndexRoute: typeof AuthenticatedSettingsIndexRoute
 }
 
 const AuthenticatedSettingsRouteRouteChildren: AuthenticatedSettingsRouteRouteChildren =
   {
+    AuthenticatedSettingsAccountRoute: AuthenticatedSettingsAccountRoute,
+    AuthenticatedSettingsGenerationRoute: AuthenticatedSettingsGenerationRoute,
+    AuthenticatedSettingsReferencesRoute: AuthenticatedSettingsReferencesRoute,
+    AuthenticatedSettingsUsageRoute: AuthenticatedSettingsUsageRoute,
     AuthenticatedSettingsIndexRoute: AuthenticatedSettingsIndexRoute,
   }
 
