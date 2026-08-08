@@ -13,8 +13,11 @@ export const Route = createFileRoute("/_authenticated/settings/generation")({
 const fields = [
   { key: "default_size", label: "Default size", options: ["1024x1024", "1024x1536", "1536x1024"] },
   { key: "default_quality", label: "Default quality", options: ["low", "medium", "high"] },
-  { key: "default_format", label: "Default format", options: ["png", "jpeg", "webp"] },
+  { key: "default_output_format", label: "Default format", options: ["png", "jpeg", "webp"] },
 ] as const;
+
+type SettingKey = (typeof fields)[number]["key"];
+
 
 function GenerationSettings() {
   const { user } = useAuth();
