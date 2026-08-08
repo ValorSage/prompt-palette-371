@@ -96,7 +96,7 @@ export async function ensureCollectionProfile(db: DB, userId: string, collection
       collection_id: collectionId,
       fingerprint,
       summary: profile.summary,
-      profile: profile as unknown as Database["public"]["Tables"]["reference_profiles"]["Insert"]["profile"],
+      profile: profile as unknown as Database["public"]["Tables"]["reference_profiles"]["Row"]["profile"],
       image_count: images.length,
     })
     .select("*")
