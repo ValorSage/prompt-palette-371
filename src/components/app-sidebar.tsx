@@ -8,6 +8,7 @@ import {
   BarChart3,
   Sparkles,
   User as UserIcon,
+  LogOut,
 } from "lucide-react";
 
 import {
@@ -23,6 +24,13 @@ import {
   SidebarMenuItem,
 } from "@/components/ui/sidebar";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import {
+  DropdownMenu,
+  DropdownMenuTrigger,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuSeparator,
+} from "@/components/ui/dropdown-menu";
 import { useAuth } from "@/hooks/useAuth";
 
 const items = [
@@ -32,13 +40,8 @@ const items = [
   { title: "Favorites", url: "/gallery", search: { favorites: true }, icon: Heart },
 ] as const;
 
-const bottomItems = [
-  { title: "Settings", url: "/settings", icon: SettingsIcon },
-  { title: "Usage", url: "/settings/usage", icon: BarChart3 },
-  { title: "Profile", url: "/settings/account", icon: UserIcon },
-] as const;
 
-export function AppSidebar() {
+export function AppSidebar({ onSignOut }: { onSignOut?: () => void }) {
   const path = useRouterState({ select: (s) => s.location.pathname });
   const { user } = useAuth();
   const name = (user?.user_metadata?.["full_name"] as string) ?? user?.email ?? "Account";
@@ -93,33 +96,50 @@ export function AppSidebar() {
           </SidebarGroupContent>
         </SidebarGroup>
 
-        <SidebarGroup>
-          <SidebarGroupLabel>Account</SidebarGroupLabel>
-          <SidebarGroupContent>
-            <SidebarMenu>
-              {bottomItems.map((item) => (
-                <SidebarMenuItem key={item.title}>
-                  <SidebarMenuButton asChild isActive={path === item.url} tooltip={item.title}>
-                    <Link to={item.url}>
-                      <item.icon className="h-4 w-4" />
-                      <span>{item.title}</span>
-                    </Link>
-                  </SidebarMenuButton>
-                </SidebarMenuItem>
-              ))}
-            </SidebarMenu>
-          </SidebarGroupContent>
-        </SidebarGroup>
       </SidebarContent>
 
       <SidebarFooter className="border-t border-sidebar-border p-3">
-        <div className="flex items-center gap-2 overflow-hidden">
-          <Avatar className="h-7 w-7">
-            {avatar ? <AvatarImage src={avatar} alt={name} /> : null}
-            <AvatarFallback className="text-xs">{name.slice(0, 2).toUpperCase()}</AvatarFallback>
-          </Avatar>
-          <span className="truncate text-xs text-muted-foreground group-data-[collapsible=icon]:hidden">{name}</span>
-        </div>
+        <DropdownMenu>
+          <DropdownMenuTrigger asChild>
+            <button className="w-full flex items-center gap-2 overflow-hidden">
+              <Avatar className="h-7 w-7">
+                {avatar ? <AvatarImage src={avatar} alt={name} /> : null}
+                <AvatarFallback className="text-xs">{name.slice(0, 2).toUpperCase()}</AvatarFallback>
+              </Avatar>
+              <span className="truncate text-xs text-muted-foreground group-data-[collapsible=icon]:hidden text-left">{name}</span>
+            </button>
+          </DropdownMenuTrigger>
+
+          <DropdownMenuContent side="top">
+            <DropdownMenuItem asChild>
+              <Link to="/settings" className="flex items-center gap-2 w-full">
+                <SettingsIcon className="h-4 w-4" />
+                <span>Settings</span>
+              </Link>
+            </DropdownMenuItem>
+
+            <DropdownMenuItem asChild>
+              <Link to="/settings/usage" className="flex items-center gap-2 w-full">
+                <BarChart3 className="h-4 w-4" />
+                <span>Usage</span>
+              </Link>
+            </DropdownMenuItem>
+
+            <DropdownMenuItem asChild>
+              <Link to="/settings/account" className="flex items-center gap-2 w-full">
+                <UserIcon className="h-4 w-4" />
+                <span>Profile</span>
+              </Link>
+            </DropdownMenuItem>
+
+            <DropdownMenuSeparator />
+
+            <DropdownMenuItem onSelect={() => onSignOut && onSignOut()} className="text-destructive flex items-center gap-2">
+              <LogOut className="h-4 w-4" />
+              <span>Sign out</span>
+            </DropdownMenuItem>
+          </DropdownMenuContent>
+        </DropdownMenu>
       </SidebarFooter>
     </Sidebar>
   );
