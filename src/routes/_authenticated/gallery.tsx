@@ -1,4 +1,4 @@
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, Link } from "@tanstack/react-router";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useState } from "react";
 import { Heart, Trash2, Search } from "lucide-react";
@@ -72,7 +72,20 @@ function GalleryPage() {
 
   return (
     <div className="mx-auto max-w-6xl px-5 py-8">
-      <h1 className="text-2xl font-semibold">{favorites ? "Favorites" : "Gallery"}</h1>
+      <div className="flex items-center justify-between gap-3">
+        <h1 className="text-2xl font-semibold">{favorites ? "Favorites" : "Gallery"}</h1>
+        <Button
+          asChild
+          size="icon"
+          variant={favorites ? "default" : "outline"}
+          aria-label={favorites ? "Show all images" : "Show favorites only"}
+          title={favorites ? "Show all images" : "Show favorites only"}
+        >
+          <Link to="/gallery" search={favorites ? {} : { favorites: true }}>
+            <Heart className="h-4 w-4" fill={favorites ? "currentColor" : "none"} />
+          </Link>
+        </Button>
+      </div>
 
       <div className="mt-5 flex flex-col gap-2 sm:flex-row">
         <div className="relative flex-1">

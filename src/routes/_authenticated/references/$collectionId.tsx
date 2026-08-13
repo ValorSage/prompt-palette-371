@@ -133,7 +133,23 @@ function CollectionPage() {
         <Button className="gap-1.5" onClick={() => fileInput.current?.click()} disabled={uploading}>
           {uploading ? <Loader2 className="h-4 w-4 animate-spin" /> : <Upload className="h-4 w-4" />} Upload
         </Button>
-        <Button variant="outline" className="gap-1.5" onClick={() => runAnalysis.mutate()} disabled={runAnalysis.isPending}>
+        <Button
+          variant="outline"
+          className="gap-1.5"
+          title={
+            (collection.data?.reference_images.length ?? 0) === 0
+              ? "Upload images before analysing this collection"
+              : "Analyse this collection into a visual profile"
+          }
+          onClick={() => {
+            if ((collection.data?.reference_images.length ?? 0) === 0) {
+              toast.error("Add at least one image before analysing this collection.");
+              return;
+            }
+            runAnalysis.mutate();
+          }}
+          disabled={runAnalysis.isPending || (collection.data?.reference_images.length ?? 0) === 0}
+        >
           {runAnalysis.isPending ? <Loader2 className="h-4 w-4 animate-spin" /> : <Wand2 className="h-4 w-4" />} Analyze
         </Button>
       </div>
