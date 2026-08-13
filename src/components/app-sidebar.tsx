@@ -85,7 +85,7 @@ export function AppSidebar({ onSignOut }: { onSignOut?: () => void }) {
                     isActive={path.startsWith(item.url) && !("search" in item)}
                     tooltip={item.title}
                   >
-                    <Link to={item.url} search={"search" in item ? item.search : undefined}>
+                    <Link to={item.url} {...("search" in item ? { search: item.search } : {})}>
                       <item.icon className="h-4 w-4" />
                       <span>{item.title}</span>
                     </Link>
