@@ -37,7 +37,6 @@ const items = [
   { title: "Projects", url: "/projects", icon: FolderKanban },
   { title: "Gallery", url: "/gallery", icon: Images },
   { title: "References", url: "/references", icon: Layers },
-  { title: "Favorites", url: "/gallery", search: { favorites: true }, icon: Heart },
 ] as const;
 
 
@@ -115,20 +114,6 @@ export function AppSidebar({ onSignOut }: { onSignOut?: () => void }) {
               <Link to="/settings" className="flex items-center gap-2 w-full">
                 <SettingsIcon className="h-4 w-4" />
                 <span>Settings</span>
-              </Link>
-            </DropdownMenuItem>
-
-            <DropdownMenuItem asChild>
-              <Link to="/settings/usage" className="flex items-center gap-2 w-full">
-                <BarChart3 className="h-4 w-4" />
-                <span>Usage</span>
-              </Link>
-            </DropdownMenuItem>
-
-            <DropdownMenuItem asChild>
-              <Link to="/settings/account" className="flex items-center gap-2 w-full">
-                <UserIcon className="h-4 w-4" />
-                <span>Profile</span>
               </Link>
             </DropdownMenuItem>
 
