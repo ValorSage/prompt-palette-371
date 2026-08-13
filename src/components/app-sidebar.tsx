@@ -1,15 +1,5 @@
 import { Link, useRouterState } from "@tanstack/react-router";
-import {
-  Images,
-  FolderKanban,
-  Layers,
-  Heart,
-  Settings as SettingsIcon,
-  BarChart3,
-  Sparkles,
-  User as UserIcon,
-  LogOut,
-} from "lucide-react";
+import { Images, FolderKanban, Layers, Settings as SettingsIcon, Sparkles, LogOut } from "lucide-react";
 
 import {
   Sidebar,
