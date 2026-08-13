@@ -107,6 +107,67 @@ export async function ensureCollectionProfile(db: DB, userId: string, collection
   return inserted;
 }
 
+/** Prompt agent: enhances a rough idea using the attached images + reference profiles. */
+export async function runPromptEnhance(
+  db: DB,
+  _userId: string,
+  input: {
+    prompt: string;
+    mode?: "generate" | "edit";
+    aspect?: string;
+    uploadedPaths?: string[];
+    referenceImageIds?: string[];
+    referenceCollectionIds?: string[];
+  },
+) {
+  const { enhancePrompt } = await import("./prompt.server");
+
+  let referenceSummary = "";
+  const collectionIds = (input.referenceCollectionIds ?? []).slice(0, 5);
+  if (collectionIds.length > 0) {
+    const { data: profiles } = await db
+      .from("reference_profiles")
+      .select("summary, collection_id, created_at")
+      .in("collection_id", collectionIds)
+      .order("created_at", { ascending: false });
+    referenceSummary = (profiles ?? []).map((p) => p.summary).slice(0, 3).join(" ");
+  }
+
+  const images: Array<{ mimeType: string; base64: string }> = [];
+  for (const path of (input.uploadedPaths ?? []).slice(0, 3)) {
+    try {
+      images.push({ mimeType: "image/png", base64: toBase64(await download(db, "references", path)) });
+    } catch {
+      /* skip unreadable uploads */
+    }
+  }
+  const refIds = (input.referenceImageIds ?? []).slice(0, 3);
+  if (images.length < 3 && refIds.length > 0) {
+    const { data: refs } = await db
+      .from("reference_images")
+      .select("storage_path, mime_type")
+      .in("id", refIds)
+      .limit(3);
+    for (const r of refs ?? []) {
+      if (images.length >= 3) break;
+      try {
+        images.push({ mimeType: r.mime_type, base64: toBase64(await download(db, "references", r.storage_path)) });
+      } catch {
+        /* skip unreadable references */
+      }
+    }
+  }
+
+  const enhanceArgs = {
+    prompt: input.prompt,
+    ...(input.mode ? { mode: input.mode } : {}),
+    ...(input.aspect ? { aspect: input.aspect } : {}),
+    ...(referenceSummary ? { referenceSummary } : {}),
+    ...(images.length > 0 ? { images } : {}),
+  };
+  return { prompt: await enhancePrompt(enhanceArgs) };
+}
+
 export async function runGeneration(db: DB, userId: string, input: GenerateInput) {
   const prompt = input.prompt.trim();
   if (!prompt) throw new Error("A prompt is required.");
