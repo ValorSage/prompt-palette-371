@@ -80,7 +80,7 @@ export async function ensureCollectionProfile(db: DB, userId: string, collection
     .maybeSingle();
   if (cached) return cached;
 
-  const sample = images.slice(0, 8);
+  const sample = images.slice(0, 12);
   const encoded = await Promise.all(
     sample.map(async (img) => ({
       mimeType: img.mime_type,
