@@ -81,10 +81,10 @@ export function AppSidebar({ onSignOut }: { onSignOut?: () => void }) {
                 <SidebarMenuItem key={item.title}>
                   <SidebarMenuButton
                     asChild
-                    isActive={path.startsWith(item.url) && !("search" in item)}
+                    isActive={path.startsWith(item.url)}
                     tooltip={item.title}
                   >
-                    <Link to={item.url} {...("search" in item ? { search: item.search } : {})}>
+                    <Link to={item.url}>
                       <item.icon className="h-4 w-4" />
                       <span>{item.title}</span>
                     </Link>
