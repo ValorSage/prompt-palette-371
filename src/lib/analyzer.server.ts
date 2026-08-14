@@ -41,9 +41,16 @@ export async function analyzeReferenceImages(
     {
       type: "text",
       text:
-        "Analyze these reference images as one coherent visual direction. Reply with ONLY a JSON object with the keys: " +
-        "style, colors, lighting, composition, camera, materials, textures, subjects, mood, design_language, summary. " +
-        "Each value must be a short descriptive string. summary must be 1-3 sentences usable as guidance inside an image generation prompt.",
+        "You are a senior art director. Study ALL of these reference images together and extract the single coherent visual " +
+        "direction they share (not a per-image description). Reply with ONLY a JSON object with the keys: " +
+        "style, colors, lighting, composition, camera, materials, textures, subjects, mood, design_language, summary.\n" +
+        "Guidance per key: style = art/render style and era; colors = concrete palette with hex codes when readable and how they " +
+        "are distributed; lighting = key/fill, direction, softness, contrast; composition = framing, crop, negative space, rule of " +
+        "thirds/symmetry; camera = lens, focal length feel, depth of field, angle; materials = surfaces and finishes; textures = grain, " +
+        "noise, brushwork, imperfections; subjects = recurring subject matter and props; mood = emotional register; design_language = " +
+        "typography, layout, iconography, spacing and branding cues if any.\n" +
+        "Each value is a short, concrete, reusable English string (max ~30 words) — no hedging, no 'various'. " +
+        "summary must be 2-4 sentences written so it can be pasted directly into an image generation prompt as style guidance.",
     },
     ...images.map((img) => ({
       type: "image_url",
