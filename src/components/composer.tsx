@@ -71,8 +71,32 @@ export function Composer({
   const [refPickerOpen, setRefPickerOpen] = useState(false);
   const [selectedRefs, setSelectedRefs] = useState<string[]>([]);
   const [selectedCollections, setSelectedCollections] = useState<string[]>([]);
+  const [promptBeforeEnhance, setPromptBeforeEnhance] = useState<string | null>(null);
 
   useEffect(() => setSettings(defaults), [defaults]);
+
+  const enhancement = useMutation({
+    mutationFn: async () => {
+      const before = prompt;
+      const result = await enhance({
+        data: {
+          prompt: before,
+          mode: uploads.length > 0 || previousImageId ? "edit" : "generate",
+          aspect: settings.size,
+          uploadedPaths: uploads.map((u) => u.path),
+          referenceImageIds: selectedRefs,
+          referenceCollectionIds: selectedCollections,
+        },
+      });
+      return { before, after: result.prompt };
+    },
+    onSuccess: ({ before, after }) => {
+      setPromptBeforeEnhance(before);
+      setPrompt(after);
+      toast.success("Prompt enhanced");
+    },
+    onError: (error: Error) => toast.error("Could not enhance prompt", { description: error.message }),
+  });
 
   const { data: collections } = useQuery({
     queryKey: ["collections"],
