@@ -243,6 +243,34 @@ export function Composer({
               Add Image
             </Button>
 
+            <Button
+              variant="ghost"
+              size="sm"
+              className="gap-1.5"
+              title="Rewrite your idea into a detailed, best-practice image prompt"
+              disabled={!prompt.trim() || enhancement.isPending || busy}
+              onClick={() => enhancement.mutate()}
+            >
+              {enhancement.isPending ? <Loader2 className="h-4 w-4 animate-spin" /> : <Wand2 className="h-4 w-4" />}
+              Enhance
+            </Button>
+
+            {promptBeforeEnhance !== null && (
+              <Button
+                variant="ghost"
+                size="sm"
+                className="gap-1.5"
+                title="Restore your original wording"
+                onClick={() => {
+                  setPrompt(promptBeforeEnhance);
+                  setPromptBeforeEnhance(null);
+                }}
+              >
+                <Undo2 className="h-4 w-4" />
+                Undo
+              </Button>
+            )}
+
             <Button variant="ghost" size="sm" className="gap-1.5" onClick={() => setRefPickerOpen(true)}>
               <Layers className="h-4 w-4" />
               References
