@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
-import { ImagePlus, Layers, History, Settings2, Send, X, Loader2 } from "lucide-react";
+import { ImagePlus, Layers, History, Settings2, Send, X, Loader2, Wand2, Undo2 } from "lucide-react";
 import { toast } from "sonner";
 
 import { Button } from "@/components/ui/button";
@@ -20,7 +20,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/u
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Checkbox } from "@/components/ui/checkbox";
 import { supabase } from "@/integrations/supabase/client";
-import { generateImage } from "@/lib/generation.functions";
+import { enhancePromptFn, generateImage } from "@/lib/generation.functions";
 import { uploadToBucket, validateImageFile } from "@/lib/data";
 import { SignedImage } from "@/components/signed-image";
 import { cn } from "@/lib/utils";
@@ -61,6 +61,7 @@ export function Composer({
 }) {
   const queryClient = useQueryClient();
   const generate = useServerFn(generateImage);
+  const enhance = useServerFn(enhancePromptFn);
   const fileInput = useRef<HTMLInputElement>(null);
 
   const [prompt, setPrompt] = useState("");
