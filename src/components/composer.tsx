@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
-import { ImagePlus, Layers, History, Settings2, Send, X, Loader2 } from "lucide-react";
+import { ImagePlus, Layers, History, Settings2, Send, X, Loader2, Wand2, Undo2 } from "lucide-react";
 import { toast } from "sonner";
 
 import { Button } from "@/components/ui/button";
@@ -20,7 +20,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/u
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Checkbox } from "@/components/ui/checkbox";
 import { supabase } from "@/integrations/supabase/client";
-import { generateImage } from "@/lib/generation.functions";
+import { enhancePromptFn, generateImage } from "@/lib/generation.functions";
 import { uploadToBucket, validateImageFile } from "@/lib/data";
 import { SignedImage } from "@/components/signed-image";
 import { cn } from "@/lib/utils";
@@ -61,6 +61,7 @@ export function Composer({
 }) {
   const queryClient = useQueryClient();
   const generate = useServerFn(generateImage);
+  const enhance = useServerFn(enhancePromptFn);
   const fileInput = useRef<HTMLInputElement>(null);
 
   const [prompt, setPrompt] = useState("");
@@ -70,8 +71,32 @@ export function Composer({
   const [refPickerOpen, setRefPickerOpen] = useState(false);
   const [selectedRefs, setSelectedRefs] = useState<string[]>([]);
   const [selectedCollections, setSelectedCollections] = useState<string[]>([]);
+  const [promptBeforeEnhance, setPromptBeforeEnhance] = useState<string | null>(null);
 
   useEffect(() => setSettings(defaults), [defaults]);
+
+  const enhancement = useMutation({
+    mutationFn: async () => {
+      const before = prompt;
+      const result = await enhance({
+        data: {
+          prompt: before,
+          mode: uploads.length > 0 || previousImageId ? "edit" : "generate",
+          aspect: settings.size,
+          uploadedPaths: uploads.map((u) => u.path),
+          referenceImageIds: selectedRefs,
+          referenceCollectionIds: selectedCollections,
+        },
+      });
+      return { before, after: result.prompt };
+    },
+    onSuccess: ({ before, after }) => {
+      setPromptBeforeEnhance(before);
+      setPrompt(after);
+      toast.success("Prompt enhanced");
+    },
+    onError: (error: Error) => toast.error("Could not enhance prompt", { description: error.message }),
+  });
 
   const { data: collections } = useQuery({
     queryKey: ["collections"],
@@ -217,6 +242,34 @@ export function Composer({
               {uploading ? <Loader2 className="h-4 w-4 animate-spin" /> : <ImagePlus className="h-4 w-4" />}
               Add Image
             </Button>
+
+            <Button
+              variant="ghost"
+              size="sm"
+              className="gap-1.5"
+              title="Rewrite your idea into a detailed, best-practice image prompt"
+              disabled={!prompt.trim() || enhancement.isPending || busy}
+              onClick={() => enhancement.mutate()}
+            >
+              {enhancement.isPending ? <Loader2 className="h-4 w-4 animate-spin" /> : <Wand2 className="h-4 w-4" />}
+              Enhance
+            </Button>
+
+            {promptBeforeEnhance !== null && (
+              <Button
+                variant="ghost"
+                size="sm"
+                className="gap-1.5"
+                title="Restore your original wording"
+                onClick={() => {
+                  setPrompt(promptBeforeEnhance);
+                  setPromptBeforeEnhance(null);
+                }}
+              >
+                <Undo2 className="h-4 w-4" />
+                Undo
+              </Button>
+            )}
 
             <Button variant="ghost" size="sm" className="gap-1.5" onClick={() => setRefPickerOpen(true)}>
               <Layers className="h-4 w-4" />

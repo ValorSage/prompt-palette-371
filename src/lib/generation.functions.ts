@@ -10,6 +10,23 @@ export const generateImage = createServerFn({ method: "POST" })
     return runGeneration(context.supabase, context.userId, data);
   });
 
+export const enhancePromptFn = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator(
+    (data: {
+      prompt: string;
+      mode?: "generate" | "edit";
+      aspect?: string;
+      uploadedPaths?: string[];
+      referenceImageIds?: string[];
+      referenceCollectionIds?: string[];
+    }) => data,
+  )
+  .handler(async ({ data, context }) => {
+    const { runPromptEnhance } = await import("./generation.server");
+    return runPromptEnhance(context.supabase, context.userId, data);
+  });
+
 export const analyzeCollection = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .inputValidator((data: { collectionId: string }) => data)
